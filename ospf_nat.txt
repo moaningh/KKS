@@ -1,0 +1,40 @@
+
+
+3. Настройка интерфейса loopback 0 для идентификации ospf (по одному на каждый роутер с процессом ospf)
+interface Loopback0
+ip address 192.168.101.3 255.255.255.255
+...
+
+4. Настройка процесса ospf
+router ospf 1
+network 192.168.4.0 0.0.0.255 area 0
+network 192.168.1.0 0.0.0.255 area 0
+network 192.168.2.0 0.0.0.255 area 0
+...
+
+5. Настройка маршрута по умолчанию только на граничном роутере
+ip route 0.0.0.0 0.0.0.0 211.211.211.2 
+
+6. Включение режима обмена дефолтным маршрутом только на граничном роутере
+router ospf 1
+default-information originate
+
+7. Объявление внутренних и внешних интерфейсов для сетевой трансляции
+interface vlan18!!!!
+ip nat outside
+
+interface GigabitEthernet0/0/0
+ip nat inside
+
+interface GigabitEthernet0/1/0
+ip nat inside
+
+8. Создание access-list для NAT только на граничном роутере
+ip access-list standard NAT
+permit 192.168.1.0 0.0.0.255
+permit 192.168.2.0 0.0.0.255
+permit 192.168.3.0 0.0.0.63
+permit 192.168.3.64 0.0.0.31
+
+9. Команда включение трансляции dynamic NAT (overload)
+ip nat inside source list NAT interface gi0/0 overload 
